@@ -1,4 +1,14 @@
-function add3DTransformable($transformable) {
+var MappingJS = MappingJS || {version: 0.01, distortables: []}
+
+
+MappingJS.Distortable = function(element) {
+    this.__proto__ = this.add3DTransformable(element);
+    MappingJS.distortables.push(this);
+}
+
+
+
+MappingJS.add3DTransformable = function($transformable) {
     var handleSize = 20;
 
     var transformable_x = $transformable.position().left;
@@ -39,10 +49,12 @@ function add3DTransformable($transformable) {
     makeTransformableDragable($transformable)
 
 
-    enableKeyboardInteraction()
+    this.enableKeyboardInteraction()
+
+    return $transformable;
 }
 
-function enableKeyboardInteraction() {
+MappingJS.enableKeyboardInteraction = function() {
     $("body").keydown(function(event){
         if (event.keyCode == 32) {
             var elements = [$(".handle")]
@@ -56,7 +68,7 @@ function enableKeyboardInteraction() {
 }
 
 
-function makeDragable($dragable, $transformable) {
+MappingJS.makeDragable = function($dragable, $transformable) {
 
 
     $dragable.mousedown(function() {
@@ -72,9 +84,7 @@ function makeDragable($dragable, $transformable) {
     });
 }
 
-function makeTransformableDragable($dragable) {
-
-
+MappingJS.makeTransformableDragable = function($dragable) {
     $dragable.mousedown(function(dEvent) {
         var lastX = dEvent.pageX;
         var lastY = dEvent.pageY;
@@ -105,7 +115,7 @@ function makeTransformableDragable($dragable) {
 }
 
 
-function update($transformable) {
+MappingJS.update = function($transformable) {
     var box = $transformable
 
     transform2d(box[0], 
@@ -120,8 +130,7 @@ function update($transformable) {
     );
 }
 
-
-function adj(m) { // Compute the adjugate of m
+MappingJS.adj = function(m) { // Compute the adjugate of m
     return [
         m[4] * m[8] - m[5] * m[7], m[2] * m[7] - m[1] * m[8], m[1] * m[5] - m[2] * m[4],
         m[5] * m[6] - m[3] * m[8], m[0] * m[8] - m[2] * m[6], m[2] * m[3] - m[0] * m[5],
@@ -130,7 +139,7 @@ function adj(m) { // Compute the adjugate of m
 }
 
 
-function multmm(a, b) { // multiply two matrices
+MappingJS.multmm = function(a, b) { // multiply two matrices
     var c = Array(9);
     for (var i = 0; i != 3; ++i) {
         for (var j = 0; j != 3; ++j) {
@@ -144,7 +153,7 @@ function multmm(a, b) { // multiply two matrices
     return c;
 }
 
-function multmv(m, v) { // multiply matrix and vector
+MappingJS.multmv = function(m, v) { // multiply matrix and vector
     return [
         m[0] * v[0] + m[1] * v[1] + m[2] * v[2],
         m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
@@ -152,12 +161,12 @@ function multmv(m, v) { // multiply matrix and vector
     ];
 }
 
-function pdbg(m, v) {
+MappingJS.pdbg = function(m, v) {
     var r = multmv(m, v);
     return r + " (" + r[0] / r[2] + ", " + r[1] / r[2] + ")";
 }
 
-function basisToPoints(x1, y1, x2, y2, x3, y3, x4, y4) {
+MappingJS.basisToPoints = function(x1, y1, x2, y2, x3, y3, x4, y4) {
     var m = [
         x1, x2, x3,
         y1, y2, y3,
@@ -171,7 +180,7 @@ function basisToPoints(x1, y1, x2, y2, x3, y3, x4, y4) {
     ]);
 }
 
-function general2DProjection(
+MappingJS.general2DProjection = function(
     x1s, y1s, x1d, y1d,
     x2s, y2s, x2d, y2d,
     x3s, y3s, x3d, y3d,
@@ -182,12 +191,12 @@ function general2DProjection(
     return multmm(d, adj(s));
 }
 
-function project(m, x, y) {
+MappingJS.project = function(m, x, y) {
     var v = multmv(m, [x, y, 1]);
     return [v[0] / v[2], v[1] / v[2]];
 }
 
-function transform2d(elt, x1, y1, x2, y2, x3, y3, x4, y4) {
+MappingJS.transform2d = function(elt, x1, y1, x2, y2, x3, y3, x4, y4) {
     var w = elt.offsetWidth,
         h = elt.offsetHeight;
     var t = general2DProjection(0, 0, x1, y1, w, 0, x2, y2, 0, h, x3, y3, w, h, x4, y4);
@@ -202,4 +211,20 @@ function transform2d(elt, x1, y1, x2, y2, x3, y3, x4, y4) {
     elt.style["-moz-transform"] = t;
     elt.style["-o-transform"] = t;
     elt.style.transform = t;
+}
+
+
+MappingJS.ValueScale = function(inMin, inMax, outMin, outMax) {
+    this.inMin = inMin;
+    this.inMax = inMax;
+    this.outMin = outMin;
+    this.outMax = outMax;
+
+    this.scale = function(value) {
+        return ((outMax-outMin)*(value-inMin))/(inMax-inMin)+outMin
+    }
+
+    this.bScale = function(value) {
+        return ((inMax-inMin)*(value-outMin))/(outMax-outMin)+inMin
+    }
 }

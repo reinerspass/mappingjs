@@ -4,6 +4,7 @@
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js" type="text/javascript"></script>
 <script src="distortion.js" type="text/javascript"></script>
+<script src="starfield.js" type="text/javascript"></script>
 
 <style type="text/css">
 	* {
@@ -26,11 +27,15 @@
 
     #div1,
     #div2,
-    #div3
+    #div3,
+    #div4,
+    #div5
     {
         width: 100px;
         height: 100px;
     }
+
+
 
     #div1 {
         background: url("http://rack.3.mshcdn.com/media/ZgkyMDEyLzEwLzE5LzExXzMzXzMzXzE3Nl9maWxlCnAJdGh1bWIJMTIwMHg5NjAwPg/462b8072");
@@ -55,11 +60,15 @@
 <script type="text/javascript">
 
 	$(function(){
-		add3DTransformable($("#div1"))
-		add3DTransformable($("#div2"))
-		add3DTransformable($("#div3"))
+
+        new MappingJS.Distortable($("#div1"))
+        // new MappingJS.Distortable($("#div2"))
+        // new MappingJS.Distortable($("#div3"))
+        // new MappingJS.Distortable($("#div4"))
+        // new MappingJS.Distortable($("#div5"))
 
 
+        // Color animation
         var yourfunction = function () {
             $("#div3").css("background", '#'+Math.floor(Math.random()*16777215).toString(16))
         }
@@ -75,6 +84,8 @@
 <div id="div1"></div>
 <div id="div2"></div>
 <div id="div3"></div>
+<div id="div4"></div>
+<div id="div5"></div>
 
 </body>
 </html>
