@@ -1,8 +1,8 @@
 var Starfield = function(element) {
 	element = $(element)
-	var starScale = new ValueScale(0,1,0,3)
-	var screenScaleX = new ValueScale(0,1,0,element.innerWidth())
-	var screenScaleY = new ValueScale(0,1,0,element.innerHeight())
+	var starScale = new MappingJS.ValueScale(0,1,0,3)
+	var screenScaleX = new MappingJS.ValueScale(0,1,0,element.innerWidth())
+	var screenScaleY = new MappingJS.ValueScale(0,1,0,element.innerHeight())
 	var speed = 500000
 	var numberOfStars = 200
 
@@ -26,8 +26,7 @@ var Starfield = function(element) {
 
 	var myS = new Sternschnuppe(paper)
 
-
-	window.setInterval(yourfunction, 5000);
+	window.setInterval(yourfunction, 2000);
 	function yourfunction() { 
 		myS.fire()		
 	}
@@ -36,9 +35,9 @@ var Starfield = function(element) {
 
 var Sternschnuppe = function(paper) {
 	this.paper = paper;
-	var starScale = new ValueScale(0,1,0,3)
-	var screenScaleX = new ValueScale(0,1,0,window.innerWidth)
-	var screenScaleY = new ValueScale(0,1,0,window.innerHeight)
+	var starScale = new MappingJS.ValueScale(0,1,0,3)
+	var screenScaleX = new MappingJS.ValueScale(0,1,0,window.innerWidth)
+	var screenScaleY = new MappingJS.ValueScale(0,1,0,window.innerHeight)
 
 	this.fire = function() {
 		var fx = screenScaleX.scale(Math.random(Date.now()))
@@ -46,7 +45,6 @@ var Sternschnuppe = function(paper) {
 		var tx = screenScaleX.scale(Math.random(Date.now()))
 		var ty = screenScaleY.scale(Math.random(Date.now()))
 		var ssize = starScale.scale(Math.random(Date.now()))
-		ssize = 5
 		var sternSchnuppe = this.paper.circle(fx,fy,ssize)
 		var sternSchnuppenAnimation = Raphael.animation( {cx: tx, cy:ty, fill:"#000"}, 1000, "easeOut");
 		sternSchnuppe.attr("fill", "#fff");

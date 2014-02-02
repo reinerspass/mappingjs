@@ -1,14 +1,75 @@
 var MappingJS = MappingJS || {version: 0.01, distortables: []}
 
 
-MappingJS.Distortable = function(element) {
-    this.__proto__ = this.add3DTransformable(element);
+MappingJS.Distortable = function($transformable) {
+
+    var that = this;
+
+    this.makeDragable = function($dragable, $transformable) {
+
+
+        $dragable.mousedown(function() {
+            $transformable.css("background", "green");
+            $(window).mousemove(function(event) {
+                $dragable.css("-webkit-transform", "translate(" + (event.pageX - $dragable.outerWidth() / 2) + "px, " + (event.pageY - $dragable.outerHeight() / 2) + "px)");
+                that.update($transformable)
+            });
+        })
+        .mouseup(function() {
+            $(window).unbind("mousemove");
+            $transformable.css("background", $transformable.originalBackground);
+        });
+    }
+
+    this.makeTransformableDragable = function($dragable) {
+        $dragable.mousedown(function(dEvent) {
+            var lastX = dEvent.pageX;
+            var lastY = dEvent.pageY;
+            $dragable.css("background", "green");
+
+            $(window).mousemove(function(event) {
+                var transX = event.pageX - lastX;
+                var transY = event.pageY - lastY;
+
+                for (var i = $dragable.handles.length - 1; i >= 0; i--) {
+                    var $handle = $dragable.handles[i];
+                    $handle.css("-webkit-transform", "translate(" + ($handle.offset().left + transX) + "px, " + ($handle.offset().top + transY) + "px)");
+                };
+
+
+                that.update($dragable)
+
+
+                lastX = event.pageX;
+                lastY = event.pageY;
+            });
+
+        })
+        .mouseup(function() {
+            $(window).unbind("mousemove");
+            $dragable.css("background", $dragable.originalBackground);
+        });
+    }
+
+    this.update = function($transformable) {
+        var box = $transformable
+
+        MappingJS.transform2d(box[0], 
+            box.handle_top_left.position().left + box.handle_top_left.width()/2, 
+            box.handle_top_left.position().top + box.handle_top_left.height()/2,
+            box.handle_top_right.position().left + box.handle_top_right.width()/2, 
+            box.handle_top_right.position().top + box.handle_top_right.height()/2,
+            box.handle_bottom_left.position().left + box.handle_bottom_left.width()/2, 
+            box.handle_bottom_left.position().top + box.handle_bottom_left.height()/2,
+            box.handle_bottom_right.position().left + box.handle_bottom_right.width()/2, 
+            box.handle_bottom_right.position().top + box.handle_bottom_right.height()/2
+        );
+    }
+
+    this.__proto__ = $transformable;
     MappingJS.distortables.push(this);
-}
 
 
-
-MappingJS.add3DTransformable = function($transformable) {
     var handleSize = 20;
 
     var transformable_x = $transformable.position().left;
@@ -25,34 +86,37 @@ MappingJS.add3DTransformable = function($transformable) {
     $transformable.handle_top_left = $("<div class='handle top-left' style='width: " + handleSize + "; height: " + handleSize + "')/>")
     $transformable.handles.push($transformable.handle_top_left);
     $transformable.handle_top_left.css("-webkit-transform", "translate(" + (transformable_x - handleSize / 2) + "px, " + (transformable_y - handleSize / 2) + "px)");
-    makeDragable($transformable.handle_top_left, $transformable)
+    this.makeDragable($transformable.handle_top_left, $transformable)
 
     $transformable.handle_top_right = $("<div class='handle top-right' style='width: " + handleSize + "; height: " + handleSize + "')/>");
     $transformable.handles.push($transformable.handle_top_right)
     $transformable.handle_top_right.css("-webkit-transform", "translate(" + (transformable_x - handleSize / 2 + transformable_width) + "px, " + (transformable_y - handleSize / 2) + "px)");
-    makeDragable($transformable.handle_top_right, $transformable)
+    this.makeDragable($transformable.handle_top_right, $transformable)
 
     $transformable.handle_bottom_left = $("<div class='handle bottom-left' style='width: " + handleSize + "; height: " + handleSize + "')/>");
     $transformable.handles.push($transformable.handle_bottom_left);
     $transformable.handle_bottom_left.css("-webkit-transform", "translate(" + (transformable_x - handleSize / 2) + "px, " + (transformable_y - handleSize / 2 + transformable_height) + "px)");
-    makeDragable($transformable.handle_bottom_left, $transformable)
+    this.makeDragable($transformable.handle_bottom_left, $transformable)
 
     $transformable.handle_bottom_right = $("<div class='handle bottom-right' style='width: " + handleSize + "; height: " + handleSize + "')/>");
     $transformable.handles.push($transformable.handle_bottom_right)
     $transformable.handle_bottom_right.css("-webkit-transform", "translate(" + (transformable_x - handleSize / 2 + transformable_width) + "px, " + (transformable_y - handleSize / 2 + transformable_height) + "px)");
-    makeDragable($transformable.handle_bottom_right, $transformable)
+    this.makeDragable($transformable.handle_bottom_right, $transformable)
 
     for (var i = $transformable.handles.length - 1; i >= 0; i--) {
         $("body").append($transformable.handles[i])
     };
 
-    makeTransformableDragable($transformable)
+    this.makeTransformableDragable($transformable)
 
 
-    this.enableKeyboardInteraction()
+    MappingJS.enableKeyboardInteraction()
 
-    return $transformable;
+    this.__proto__ = $transformable;
+
+
 }
+
 
 MappingJS.enableKeyboardInteraction = function() {
     $("body").keydown(function(event){
@@ -65,69 +129,6 @@ MappingJS.enableKeyboardInteraction = function() {
             }
         } 
     });
-}
-
-
-MappingJS.makeDragable = function($dragable, $transformable) {
-
-
-    $dragable.mousedown(function() {
-        $transformable.css("background", "green");
-        $(window).mousemove(function(event) {
-            $dragable.css("-webkit-transform", "translate(" + (event.pageX - $dragable.outerWidth() / 2) + "px, " + (event.pageY - $dragable.outerHeight() / 2) + "px)");
-            update($transformable)
-        });
-    })
-    .mouseup(function() {
-        $(window).unbind("mousemove");
-        $transformable.css("background", $transformable.originalBackground);
-    });
-}
-
-MappingJS.makeTransformableDragable = function($dragable) {
-    $dragable.mousedown(function(dEvent) {
-        var lastX = dEvent.pageX;
-        var lastY = dEvent.pageY;
-        $dragable.css("background", "green");
-
-        $(window).mousemove(function(event) {
-            var transX = event.pageX - lastX;
-            var transY = event.pageY - lastY;
-
-            for (var i = $dragable.handles.length - 1; i >= 0; i--) {
-                var $handle = $dragable.handles[i];
-                $handle.css("-webkit-transform", "translate(" + ($handle.offset().left + transX) + "px, " + ($handle.offset().top + transY) + "px)");
-            };
-
-
-            update($dragable)
-
-
-            lastX = event.pageX;
-            lastY = event.pageY;
-        });
-
-    })
-    .mouseup(function() {
-        $(window).unbind("mousemove");
-        $dragable.css("background", $dragable.originalBackground);
-    });
-}
-
-
-MappingJS.update = function($transformable) {
-    var box = $transformable
-
-    transform2d(box[0], 
-        box.handle_top_left.position().left + box.handle_top_left.width()/2, 
-        box.handle_top_left.position().top + box.handle_top_left.height()/2,
-        box.handle_top_right.position().left + box.handle_top_right.width()/2, 
-        box.handle_top_right.position().top + box.handle_top_right.height()/2,
-        box.handle_bottom_left.position().left + box.handle_bottom_left.width()/2, 
-        box.handle_bottom_left.position().top + box.handle_bottom_left.height()/2,
-        box.handle_bottom_right.position().left + box.handle_bottom_right.width()/2, 
-        box.handle_bottom_right.position().top + box.handle_bottom_right.height()/2
-    );
 }
 
 MappingJS.adj = function(m) { // Compute the adjugate of m
@@ -172,8 +173,8 @@ MappingJS.basisToPoints = function(x1, y1, x2, y2, x3, y3, x4, y4) {
         y1, y2, y3,
         1, 1, 1
     ];
-    var v = multmv(adj(m), [x4, y4, 1]);
-    return multmm(m, [
+    var v = MappingJS.multmv(MappingJS.adj(m), [x4, y4, 1]);
+    return MappingJS.multmm(m, [
         v[0], 0, 0,
         0, v[1], 0,
         0, 0, v[2]
@@ -186,9 +187,9 @@ MappingJS.general2DProjection = function(
     x3s, y3s, x3d, y3d,
     x4s, y4s, x4d, y4d
 ) {
-    var s = basisToPoints(x1s, y1s, x2s, y2s, x3s, y3s, x4s, y4s);
-    var d = basisToPoints(x1d, y1d, x2d, y2d, x3d, y3d, x4d, y4d);
-    return multmm(d, adj(s));
+    var s = MappingJS.basisToPoints(x1s, y1s, x2s, y2s, x3s, y3s, x4s, y4s);
+    var d = MappingJS.basisToPoints(x1d, y1d, x2d, y2d, x3d, y3d, x4d, y4d);
+    return MappingJS.multmm(d, MappingJS.adj(s));
 }
 
 MappingJS.project = function(m, x, y) {
@@ -199,7 +200,7 @@ MappingJS.project = function(m, x, y) {
 MappingJS.transform2d = function(elt, x1, y1, x2, y2, x3, y3, x4, y4) {
     var w = elt.offsetWidth,
         h = elt.offsetHeight;
-    var t = general2DProjection(0, 0, x1, y1, w, 0, x2, y2, 0, h, x3, y3, w, h, x4, y4);
+    var t = MappingJS.general2DProjection(0, 0, x1, y1, w, 0, x2, y2, 0, h, x3, y3, w, h, x4, y4);
     for (i = 0; i != 9; ++i) t[i] = t[i] / t[8];
     t = [t[0], t[3], 0, t[6],
         t[1], t[4], 0, t[7],
