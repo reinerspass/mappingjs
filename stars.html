@@ -1,0 +1,128 @@
+<html>
+<head>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js" type="text/javascript"></script>
+<script src="distortion.js" type="text/javascript"></script>
+
+<style type="text/css">
+	* {
+		padding: 0;
+		margin: 0;
+	}
+
+	body {
+		background: black;
+	}
+
+    div.handle {
+        background: blue;
+        position: fixed;
+        top:0;
+        left:0;
+    }
+
+    #screen {
+        transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        color: white;
+        display: block;
+    }
+
+
+</style>
+
+<script type="text/javascript">
+
+	$(function(){
+
+		var starScale = new ValueScale(0,1,0,3)
+		var screenScaleX = new ValueScale(0,1,0,window.innerWidth)
+		var screenScaleY = new ValueScale(0,1,0,window.innerHeight)
+		var speed = 500000
+		var numberOfStars = 200
+
+		var paper = Raphael("screen", window.innerWidth, window.innerHeight);
+		var stars = paper.set();
+
+		for (var i = 0; i < numberOfStars; i++) {
+			var x = screenScaleX.scale(Math.random(Date.now()))
+			var y = screenScaleY.scale(Math.random(Date.now()))
+			var size = starScale.scale(Math.random(Date.now()))
+
+			var circle = paper.circle(x, y, size);
+			circle.attr("fill", "#fff");
+			stars.push(circle)
+		};
+
+
+		// stars.animate({transform:"r-45,0,0"}, 2000);
+
+		var transString = "r" + (-360)+","+window.innerWidth/2+","+window.innerHeight/2;
+		console.log(transString)
+		var aniObject = Raphael.animation( {transform: transString}, speed, "linear");
+		stars.animate(aniObject.repeat(Infinity))
+
+
+
+		var myS = new Sternschnuppe(paper)
+
+		// window.setInterval(myS.fire(),10000)
+
+		window.setInterval(yourfunction, 5000);
+		function yourfunction() { 
+			myS.fire()		
+		}
+
+		add3DTransformable($("#screen"))
+
+	})
+
+	var Sternschnuppe = function(paper) {
+
+		this.paper = paper;
+		var starScale = new ValueScale(0,1,0,3)
+		var screenScaleX = new ValueScale(0,1,0,window.innerWidth)
+		var screenScaleY = new ValueScale(0,1,0,window.innerHeight)
+
+		this.fire = function() {
+			var fx = screenScaleX.scale(Math.random(Date.now()))
+			var fy = screenScaleY.scale(Math.random(Date.now()))
+			var tx = screenScaleX.scale(Math.random(Date.now()))
+			var ty = screenScaleY.scale(Math.random(Date.now()))
+			var ssize = starScale.scale(Math.random(Date.now()))
+			ssize = 5
+			var sternSchnuppe = this.paper.circle(fx,fy,ssize)
+			var sternSchnuppenAnimation = Raphael.animation( {cx: tx, cy:ty, fill:"#000"}, 1000, "easeOut");
+			sternSchnuppe.attr("fill", "#fff");
+			sternSchnuppe.animate(sternSchnuppenAnimation)
+		}
+	}
+
+
+	var ValueScale = function(inMin, inMax, outMin, outMax) {
+    this.inMin = inMin;
+    this.inMax = inMax;
+    this.outMin = outMin;
+    this.outMax = outMax;
+
+    this.scale = function(value) {
+        return ((outMax-outMin)*(value-inMin))/(inMax-inMin)+outMin
+    }
+
+    this.bScale = function(value) {
+        return ((inMax-inMin)*(value-outMin))/(outMax-outMin)+inMin
+    }
+}
+
+
+
+</script>
+</head>
+<body>
+<div id="screen"></div>
+
+</body>
+</html>

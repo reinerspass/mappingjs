@@ -1,0 +1,80 @@
+<html>
+<head>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js" type="text/javascript"></script>
+<script src="distortion.js" type="text/javascript"></script>
+
+<style type="text/css">
+	* {
+		padding: 0;
+		margin: 0;
+		-webkit-user-select: none;
+	}
+
+	body {
+		background: black;
+	}
+
+    div.handle {
+        background: blue;
+        position: fixed;
+        top:0;
+        left:0;
+        border-radius:  10px;
+    }
+
+    #div1,
+    #div2,
+    #div3
+    {
+        width: 100px;
+        height: 100px;
+    }
+
+    #div1 {
+        background: url("http://rack.3.mshcdn.com/media/ZgkyMDEyLzEwLzE5LzExXzMzXzMzXzE3Nl9maWxlCnAJdGh1bWIJMTIwMHg5NjAwPg/462b8072");
+        background-size: 100%;
+        transition: background .1s ease-in-out;
+    }
+
+    #div2 {
+        background: url("http://31.media.tumblr.com/a48f6af91ebc009489222ba53a9d6f4b/tumblr_mhqmdxteEu1s3swo8o1_500.gif");
+        background-size: 100%;
+        transition: background .1s ease-in-out;
+    }
+
+    #div3 {
+        background: violet;
+        transition: background .5s ease-in-out;
+    }
+
+
+</style>
+
+<script type="text/javascript">
+
+	$(function(){
+		add3DTransformable($("#div1"))
+		add3DTransformable($("#div2"))
+		add3DTransformable($("#div3"))
+
+
+        var yourfunction = function () {
+            $("#div3").css("background", '#'+Math.floor(Math.random()*16777215).toString(16))
+        }
+
+        window.setInterval(yourfunction, 1000);
+
+	})
+
+
+</script>
+</head>
+<body>
+<div id="div1"></div>
+<div id="div2"></div>
+<div id="div3"></div>
+
+</body>
+</html>
